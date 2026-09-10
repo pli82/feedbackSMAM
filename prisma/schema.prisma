@@ -1,0 +1,61 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// O completare a chestionarului (o singură persoană, un singur moment).
+// "versiuneCurs" permite diferențierea ulterioară pe ediții ale cursului,
+// fără să adauge niciun câmp de identificare a respondentului.
+model Chestionar {
+  id                 String           @id @default(cuid())
+  versiuneCurs       String           @default("v1")
+  // Context de sesiune — NU identifică respondentul, doar sesiunea/grupa la
+  // care a participat. Opționale la nivel de schemă (nullable) ca migrarea
+  // să nu strice rândurile deja existente; formularul le cere totuși.
+  formator           String?
+  grupa              String?
+  creatLa            DateTime         @default(now())
+  raspunsuriLikert   RaspunsLikert[]
+  raspunsuriDeschise RaspunsDeschis[]
+
+  @@index([formator])
+  @@index([grupa])
+}
+
+// Cele 10 întrebări cu scală 1-5. Textul e ținut în baza de date (nu hardcodat
+// în UI) ca administrarea și eventualele modificări viitoare de formulare să
+// nu ceară un nou deploy.
+model IntrebareLikert {
+  id         Int             @id @default(autoincrement())
+  numar      Int             @unique
+  text       String
+  activa     Boolean         @default(true)
+  raspunsuri RaspunsLikert[]
+}
+
+model RaspunsLikert {
+  id           String          @id @default(cuid())
+  chestionarId String
+  chestionar   Chestionar      @relation(fields: [chestionarId], references: [id], onDelete: Cascade)
+  intrebareId  Int
+  intrebare    IntrebareLikert @relation(fields: [intrebareId], references: [id])
+  valoare      Int
+
+  @@unique([chestionarId, intrebareId])
+  @@index([intrebareId])
+}
+
+// Întrebările 11 și 12 (deschise, opționale).
+model RaspunsDeschis {
+  id             String     @id @default(cuid())
+  chestionarId   String
+  chestionar     Chestionar @relation(fields: [chestionarId], references: [id], onDelete: Cascade)
+  numarIntrebare Int
+  text           String
+
+  @@index([numarIntrebare])
+}

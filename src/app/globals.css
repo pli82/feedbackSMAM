@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-[#F7F5F1] text-navy-900 font-sans;
+  }
+}
+
+.scala-radio {
+  @apply flex flex-col items-center gap-2 cursor-pointer select-none;
+}
+
+.scala-radio input[type="radio"] {
+  @apply w-5 h-5 accent-navy-800 cursor-pointer;
+}
