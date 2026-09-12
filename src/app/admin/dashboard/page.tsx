@@ -1,4 +1,3 @@
-cat > src/app/admin/dashboard/page.tsx << 'DASHBOARDEOF'
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -137,7 +136,7 @@ export default function PaginaDashboardAdmin() {
           <p className="text-sm text-navy-900/60">Autoritatea Electorală Permanentă</p>
         </div>
         <div className="flex gap-2">
-          
+          <a
             href={exportUrl()}
             className="text-sm border border-navy-800/20 rounded-md px-3 py-2 hover:bg-navy-800/5 transition-colors"
           >
@@ -295,4 +294,3 @@ export default function PaginaDashboardAdmin() {
     </main>
   );
 }
-DASHBOARDEOF
