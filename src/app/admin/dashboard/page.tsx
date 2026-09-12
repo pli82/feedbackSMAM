@@ -63,6 +63,45 @@ function TabelComparatie({ titlu, randuri }: { titlu: string; randuri: RezumatGr
   );
 }
 
+type ItemClasament = { eticheta: string; valoare: number };
+
+function ClasamentBare({
+  titlu,
+  items,
+  culoare = "#1B2A4A",
+  scalaMaxima = 5,
+}: {
+  titlu: string;
+  items: ItemClasament[];
+  culoare?: string;
+  scalaMaxima?: number;
+}) {
+  if (items.length === 0) return null;
+  return (
+    <div className="bg-white border border-navy-800/10 rounded-lg p-5">
+      <p className="text-sm font-medium text-navy-900 mb-4">{titlu}</p>
+      <div className="space-y-3">
+        {items.map((item) => (
+          <div key={item.eticheta}>
+            <div className="flex justify-between gap-3 text-xs text-navy-900/70 mb-1">
+              <span>{item.eticheta}</span>
+              <span className="whitespace-nowrap font-medium text-navy-900">
+                {item.valoare.toFixed(2)} / 5
+              </span>
+            </div>
+            <div className="h-2 bg-[#F7F5F1] rounded-full overflow-hidden">
+              <div
+                className="h-2 rounded-full"
+                style={{ width: `${(item.valoare / scalaMaxima) * 100}%`, backgroundColor: culoare }}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function PaginaDashboardAdmin() {
   const router = useRouter();
   const [statistici, setStatistici] = useState<Statistici | null>(null);
@@ -96,6 +135,33 @@ export default function PaginaDashboardAdmin() {
     return statistici.raspunsuriDeschise.filter((r) => r.text.toLowerCase().includes(termen));
   }, [statistici, cautare]);
 
+  const intrebariNemultumire = useMemo(() => {
+    if (!statistici) return [];
+    return [...statistici.intrebari]
+      .filter((i) => i.totalRaspunsuri > 0)
+      .sort((a, b) => a.medie - b.medie)
+      .slice(0, 5)
+      .map((i) => ({ eticheta: `${i.numar}. ${i.text}`, valoare: i.medie }));
+  }, [statistici]);
+
+  const judeteNemultumite = useMemo(() => {
+    if (!statistici) return [];
+    return [...statistici.comparatieGrupe]
+      .filter((g) => g.totalChestionare > 0)
+      .sort((a, b) => a.mediaGenerala - b.mediaGenerala)
+      .slice(0, 5)
+      .map((g) => ({ eticheta: g.valoare, valoare: g.mediaGenerala }));
+  }, [statistici]);
+
+  const judeteMultumite = useMemo(() => {
+    if (!statistici) return [];
+    return [...statistici.comparatieGrupe]
+      .filter((g) => g.totalChestionare > 0)
+      .sort((a, b) => b.mediaGenerala - a.mediaGenerala)
+      .slice(0, 5)
+      .map((g) => ({ eticheta: g.valoare, valoare: g.mediaGenerala }));
+  }, [statistici]);
+
   async function delogheaza() {
     await fetch("/api/admin/logout", { method: "POST" });
     router.push("/admin/login");
@@ -126,6 +192,8 @@ export default function PaginaDashboardAdmin() {
     );
   }
 
+  const scorGeneral = Math.round((statistici.mediaGenerala / 5) * 100);
+
   return (
     <main className="max-w-3xl mx-auto px-4 py-8">
       <div className="flex items-center justify-between mb-6">
@@ -136,11 +204,11 @@ export default function PaginaDashboardAdmin() {
           <p className="text-sm text-navy-900/60">Autoritatea Electorală Permanentă</p>
         </div>
         <div className="flex gap-2">
-          <a
+          
             href={exportUrl()}
             className="text-sm border border-navy-800/20 rounded-md px-3 py-2 hover:bg-navy-800/5 transition-colors"
           >
-            Exportă CSV
+            Exportă Excel
           </a>
           <button
             onClick={delogheaza}
@@ -201,7 +269,7 @@ export default function PaginaDashboardAdmin() {
         )}
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
         <div className="bg-white border border-navy-800/10 rounded-lg p-4">
           <p className="text-xs text-navy-900/60 mb-1">Chestionare completate</p>
           <p className="text-2xl font-semibold text-navy-900">{statistici.totalChestionare}</p>
@@ -218,11 +286,33 @@ export default function PaginaDashboardAdmin() {
             {statistici.satisfactieGenerala ? statistici.satisfactieGenerala.medie.toFixed(2) : "–"} / 5
           </p>
         </div>
+        <div className="bg-gold-500 rounded-lg p-4">
+          <p className="text-xs text-navy-900/70 mb-1">Scor general al instruirii</p>
+          <p className="text-2xl font-semibold text-navy-900">{scorGeneral}%</p>
+        </div>
       </div>
 
       <div className="space-y-4 mb-6">
         <TabelComparatie titlu="Rezultate separate pe formator" randuri={statistici.comparatieFormatori} />
         <TabelComparatie titlu="Rezultate separate pe județ" randuri={statistici.comparatieGrupe} />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <ClasamentBare
+          titlu="Întrebări cu cele mai mari nemulțumiri"
+          items={intrebariNemultumire}
+          culoare="#B3402A"
+        />
+        <ClasamentBare
+          titlu="Județele cele mai nemulțumite"
+          items={judeteNemultumite}
+          culoare="#B3402A"
+        />
+        <ClasamentBare
+          titlu="Județele cele mai mulțumite"
+          items={judeteMultumite}
+          culoare="#1B7A4A"
+        />
       </div>
 
       <div className="space-y-4 mb-8">

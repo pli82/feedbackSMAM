@@ -1,14 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
+import ExcelJS from "exceljs";
 import { esteAdminAutentificat } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import type { Prisma } from "@prisma/client";
 
-function scapaCsv(valoare: string): string {
-  if (/[",\n]/.test(valoare)) {
-    return `"${valoare.replace(/"/g, '""')}"`;
-  }
-  return valoare;
-}
+const TEXT_INTREBARE_11 = "Ce element al cursului vi s-a părut cel mai util?";
+const TEXT_INTREBARE_12 =
+  "Ce considerați că ar putea fi îmbunătățit la viitoarele sesiuni de instruire?";
 
 export async function GET(req: NextRequest) {
   if (!(await esteAdminAutentificat())) {
@@ -32,47 +30,51 @@ export async function GET(req: NextRequest) {
     include: { raspunsuriLikert: true, raspunsuriDeschise: true },
   });
 
-  const antet = [
-    "nr_crt",
-    "data_completarii",
-    "formator",
-    "judet",
-    ...intrebari.map((i) => `intrebare_${i.numar}`),
-    "raspuns_deschis_11",
-    "raspuns_deschis_12",
+  const workbook = new ExcelJS.Workbook();
+  const foaie = workbook.addWorksheet("Răspunsuri");
+
+  foaie.columns = [
+    { header: "Nr. crt.", key: "nr", width: 8 },
+    { header: "Data completării", key: "data", width: 20 },
+    { header: "Formator", key: "formator", width: 26 },
+    { header: "Județ", key: "judet", width: 24 },
+    ...intrebari.map((i) => ({ header: i.text, key: `q${i.numar}`, width: 42 })),
+    { header: TEXT_INTREBARE_11, key: "d11", width: 45 },
+    { header: TEXT_INTREBARE_12, key: "d12", width: 45 },
   ];
 
-  const linii = chestionare.map((chestionar, index) => {
+  chestionare.forEach((chestionar, index) => {
     const valoriPerIntrebare = new Map(
       chestionar.raspunsuriLikert.map((r) => [r.intrebareId, r.valoare])
     );
-    const coloaneLikert = intrebari.map((i) => String(valoriPerIntrebare.get(i.id) ?? ""));
 
-    const raspuns11 =
-      chestionar.raspunsuriDeschise.find((r) => r.numarIntrebare === 11)?.text ?? "";
-    const raspuns12 =
-      chestionar.raspunsuriDeschise.find((r) => r.numarIntrebare === 12)?.text ?? "";
+    const rand: Record<string, string | number> = {
+      nr: index + 1,
+      data: chestionar.creatLa.toLocaleString("ro-RO"),
+      formator: chestionar.formator ?? "",
+      judet: chestionar.grupa ?? "",
+      d11: chestionar.raspunsuriDeschise.find((r) => r.numarIntrebare === 11)?.text ?? "",
+      d12: chestionar.raspunsuriDeschise.find((r) => r.numarIntrebare === 12)?.text ?? "",
+    };
 
-    return [
-      String(index + 1),
-      chestionar.creatLa.toISOString(),
-      chestionar.formator ?? "",
-      chestionar.grupa ?? "",
-      ...coloaneLikert,
-      raspuns11,
-      raspuns12,
-    ]
-      .map(scapaCsv)
-      .join(",");
+    for (const intrebare of intrebari) {
+      rand[`q${intrebare.numar}`] = valoriPerIntrebare.get(intrebare.id) ?? "";
+    }
+
+    foaie.addRow(rand);
   });
 
-  const csv = [antet.join(","), ...linii].join("\n");
+  foaie.getRow(1).font = { bold: true };
+  foaie.getRow(1).alignment = { wrapText: true, vertical: "middle" };
+  foaie.views = [{ state: "frozen", ySplit: 1 }];
 
-  return new NextResponse(csv, {
+  const buffer = await workbook.xlsx.writeBuffer();
+
+  return new NextResponse(buffer as ArrayBuffer, {
     status: 200,
     headers: {
-      "Content-Type": "text/csv; charset=utf-8",
-      "Content-Disposition": `attachment; filename="chestionar-anti-mita-${Date.now()}.csv"`,
+      "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "Content-Disposition": `attachment; filename="chestionar-anti-mita-${Date.now()}.xlsx"`,
     },
   });
 }
