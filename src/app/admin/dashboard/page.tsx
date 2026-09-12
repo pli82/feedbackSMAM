@@ -136,7 +136,7 @@ export default function PaginaDashboardAdmin() {
           <p className="text-sm text-navy-900/60">Autoritatea Electorală Permanentă</p>
         </div>
         <div className="flex gap-2">
-          <a
+          
             href={exportUrl()}
             className="text-sm border border-navy-800/20 rounded-md px-3 py-2 hover:bg-navy-800/5 transition-colors"
           >
@@ -172,7 +172,7 @@ export default function PaginaDashboardAdmin() {
         </div>
         <div>
           <label className="block text-xs text-navy-900/60 mb-1" htmlFor="filtru-grupa">
-            Grupă / sesiune
+            Județ
           </label>
           <select
             id="filtru-grupa"
@@ -180,7 +180,7 @@ export default function PaginaDashboardAdmin() {
             value={filtruGrupa}
             onChange={(e) => setFiltruGrupa(e.target.value)}
           >
-            <option value="">Toate grupele</option>
+            <option value="">Toate județele</option>
             {statistici.optiuniFiltrare.grupe.map((g) => (
               <option key={g.valoare} value={g.valoare}>
                 {g.valoare} ({g.total})
@@ -222,7 +222,7 @@ export default function PaginaDashboardAdmin() {
 
       <div className="space-y-4 mb-6">
         <TabelComparatie titlu="Rezultate separate pe formator" randuri={statistici.comparatieFormatori} />
-        <TabelComparatie titlu="Rezultate separate pe grupă / sesiune" randuri={statistici.comparatieGrupe} />
+        <TabelComparatie titlu="Rezultate separate pe județ" randuri={statistici.comparatieGrupe} />
       </div>
 
       <div className="space-y-4 mb-8">

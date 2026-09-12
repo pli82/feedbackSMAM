@@ -5,6 +5,15 @@ import { useState } from "react";
 type Intrebare = { id: number; numar: number; text: string };
 
 const FORMATORI = ["Loredana-Irina Pop", "Octavian-Mircea Chesaru", "Ambii formatori"];
+const JUDETE = [
+  "Alba", "Arad", "Argeș", "Bacău", "Bihor", "Bistrița-Năsăud", "Botoșani",
+  "Brăila", "Brașov", "București", "Buzău", "Caraș-Severin", "Călărași",
+  "Cluj", "Constanța", "Covasna", "Dâmbovița", "Dolj", "Galați", "Giurgiu",
+  "Gorj", "Harghita", "Hunedoara", "Ialomița", "Iași", "Ilfov", "Maramureș",
+  "Mehedinți", "Mureș", "Neamț", "Olt", "Prahova", "Satu Mare", "Sălaj",
+  "Sibiu", "Suceava", "Teleorman", "Timiș", "Tulcea", "Vâlcea", "Vaslui",
+  "Vrancea",
+];
 
 const SCALA = [
   { valoare: 1, eticheta: "în foarte mică măsură" },
@@ -32,8 +41,8 @@ export default function FormularChestionar({ intrebari }: { intrebari: Intrebare
   async function trimiteFormular(e: React.FormEvent) {
     e.preventDefault();
 
-    if (!formator || !grupa.trim()) {
-      setEroare("Vă rugăm selectați formatorul și completați grupa/sesiunea înainte de a trimite chestionarul.");
+ if (!formator || !grupa) {
+      setEroare("Vă rugăm selectați formatorul și județul înainte de a trimite chestionarul.");
       document.getElementById("context-sesiune")?.scrollIntoView({ behavior: "smooth", block: "center" });
       return;
     }
@@ -61,8 +70,8 @@ export default function FormularChestionar({ intrebari }: { intrebari: Intrebare
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          formator,
-          grupa: grupa.trim(),
+                  formator,
+          grupa,
           raspunsuriLikert: Object.entries(raspunsuriLikert).map(([numar, valoare]) => ({
             numar: Number(numar),
             valoare,
@@ -128,22 +137,29 @@ export default function FormularChestionar({ intrebari }: { intrebari: Intrebare
               ))}
             </select>
           </div>
-          <div>
+                   <div>
             <label className="block text-sm text-navy-900/70 mb-1" htmlFor="grupa">
-              Grupă / sesiune
+              Județ
             </label>
-            <input
+            <select
               id="grupa"
-              type="text"
-              placeholder="ex: Grupa 1, Seria martie 2026"
-              className="w-full border border-navy-800/15 rounded-md p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-navy-800/30"
+              className="w-full border border-navy-800/15 rounded-md p-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-navy-800/30"
               value={grupa}
               onChange={(e) => {
                 setGrupa(e.target.value);
                 setEroare(null);
               }}
               required
-            />
+            >
+              <option value="" disabled>
+                Selectați județul
+              </option>
+              {JUDETE.map((j) => (
+                <option key={j} value={j}>
+                  {j}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
       </div>

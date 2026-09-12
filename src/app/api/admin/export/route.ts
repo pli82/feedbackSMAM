@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
     "nr_crt",
     "data_completarii",
     "formator",
-    "grupa",
+    "judet",
     ...intrebari.map((i) => `intrebare_${i.numar}`),
     "raspuns_deschis_11",
     "raspuns_deschis_12",
