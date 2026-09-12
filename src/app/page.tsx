@@ -17,7 +17,7 @@ export default async function PaginaChestionar() {
 
   return (
     <main className="max-w-2xl mx-auto px-4 py-10">
-      <div className="bg-navy-800 text-white rounded-lg p-6 mb-6">
+      <div className="bg-navy-800 text-white rounded-lg p-6 mb-6 text-center">
         <p className="text-sm text-white/70 mb-1">Autoritatea Electorală Permanentă</p>
         <h1 className="text-xl font-serif font-semibold mb-3 leading-snug">
           Chestionar de evaluare a calității cursului de management anti-mită
