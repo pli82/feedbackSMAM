@@ -1,3 +1,4 @@
+cat > src/app/admin/dashboard/page.tsx << 'DASHBOARDEOF'
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -294,3 +295,4 @@ export default function PaginaDashboardAdmin() {
     </main>
   );
 }
+DASHBOARDEOF
