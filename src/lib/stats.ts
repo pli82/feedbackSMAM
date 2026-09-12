@@ -121,10 +121,10 @@ export async function obtineOptiuniFiltrare(): Promise<{
 // rezumat (nr. chestionare, medie generală, satisfacție Q10) per valoare
 // distinctă găsită în date.
 export async function calculeazaRezumatPerGrup(camp: "formator" | "grupa"): Promise<RezumatGrup[]> {
-  const optiuni = (await prisma.chestionar.groupBy({
-    by: [camp],
-    _count: { _all: true },
-  })) as any[];
+  const optiuni: any[] =
+    camp === "formator"
+      ? await prisma.chestionar.groupBy({ by: ["formator"], _count: { _all: true } })
+      : await prisma.chestionar.groupBy({ by: ["grupa"], _count: { _all: true } });
 
   const rezultate: RezumatGrup[] = [];
   for (const optiune of optiuni) {
