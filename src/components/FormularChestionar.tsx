@@ -12,7 +12,7 @@ type IntrebareTest = {
   raspunsCorect: string;
 };
 
-const FORMATORI = ["Loredana-Irina Pop", "Octavian-Mircea Chesaru", "Ambii formatori"];
+const FORMATORI = ["Loredana-Irina Pop", "Octavian-Mircea Chesaru"];
 const JUDETE = [
   "SEDIUL CENTRAL - BUCUREȘTI",
   "Alba", "Arad", "Argeș", "Bacău", "Bihor", "Bistrița-Năsăud", "Botoșani",
