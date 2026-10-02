@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import RezultatTest from "@/components/RezultatTest";
 
 type Intrebare = { id: number; numar: number; text: string };
 type IntrebareTest = {
@@ -133,21 +134,16 @@ export default function FormularChestionar({
   }
 
   if (trimis) {
+    // Cu test de cunoștințe: ecran cu scor, mesaj și artificii.
+    if (intrebariTest.length > 0) {
+      return <RezultatTest scor={scorTest} total={intrebariTest.length} />;
+    }
     return (
       <div className="bg-white border border-navy-800/10 rounded-lg p-8 text-center">
         <p className="text-lg font-medium text-navy-900 mb-2">
           Vă mulțumim pentru timpul acordat și pentru contribuția la îmbunătățirea
           activităților de instruire!
         </p>
-        {intrebariTest.length > 0 && (
-          <p className="text-[15px] text-navy-900 mb-2">
-            Testul de cunoștințe: ați răspuns corect la{" "}
-            <span className="font-semibold">
-              {scorTest} din {intrebariTest.length}
-            </span>{" "}
-            întrebări.
-          </p>
-        )}
         <p className="text-sm text-navy-900/60">Răspunsul dumneavoastră a fost înregistrat anonim.</p>
       </div>
     );
