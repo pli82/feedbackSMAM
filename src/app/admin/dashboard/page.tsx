@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
+import SectiuneTest from "@/components/admin/SectiuneTest";
+import type { StatisticaTest } from "@/lib/statsTest";
 
 type DistributieValoare = { valoare: number; numar: number; procent: number };
 type StatisticaIntrebare = {
@@ -30,6 +32,7 @@ type Statistici = {
   optiuniFiltrare: { formatori: OptiuneFiltrare[]; grupe: OptiuneFiltrare[] };
   comparatieFormatori: RezumatGrup[];
   comparatieGrupe: RezumatGrup[];
+  test: StatisticaTest;
 };
 
 function TabelComparatie({ titlu, randuri }: { titlu: string; randuri: RezumatGrup[] }) {
@@ -109,6 +112,7 @@ export default function PaginaDashboardAdmin() {
   const [cautare, setCautare] = useState("");
   const [filtruFormator, setFiltruFormator] = useState("");
   const [filtruGrupa, setFiltruGrupa] = useState("");
+  const [tab, setTab] = useState<"test" | "evaluare">("test");
 
   const incarcaStatistici = useCallback((formator: string, grupa: string) => {
     const params = new URLSearchParams();
@@ -204,6 +208,7 @@ export default function PaginaDashboardAdmin() {
           <p className="text-sm text-navy-900/60">Autoritatea Electorală Permanentă</p>
         </div>
         <div className="flex gap-2">
+          <a href="/admin/intrebari" className="text-sm border border-navy-800/20 rounded-md px-3 py-2 hover:bg-navy-800/5 transition-colors">Întrebări test</a>
           <a href={exportUrl()} className="text-sm border border-navy-800/20 rounded-md px-3 py-2 hover:bg-navy-800/5 transition-colors">Exportă Excel</a>
           <button
             onClick={delogheaza}
@@ -264,6 +269,31 @@ export default function PaginaDashboardAdmin() {
         )}
       </div>
 
+      <div className="flex gap-2 mb-6" role="tablist">
+        {([
+          ["test", "Partea 1 — Test de cunoștințe"],
+          ["evaluare", "Partea 2 — Evaluarea cursului"],
+        ] as const).map(([cheie, eticheta]) => (
+          <button
+            key={cheie}
+            role="tab"
+            aria-selected={tab === cheie}
+            onClick={() => setTab(cheie)}
+            className={`text-sm rounded-md px-4 py-2 border transition-colors ${
+              tab === cheie
+                ? "bg-navy-800 text-white border-navy-800"
+                : "bg-white text-navy-900 border-navy-800/20 hover:bg-navy-800/5"
+            }`}
+          >
+            {eticheta}
+          </button>
+        ))}
+      </div>
+
+      {tab === "test" ? (
+        <SectiuneTest test={statistici.test} />
+      ) : (
+      <>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
         <div className="bg-white border border-navy-800/10 rounded-lg p-4">
           <p className="text-xs text-navy-900/60 mb-1">Chestionare completate</p>
@@ -376,6 +406,8 @@ export default function PaginaDashboardAdmin() {
           ))}
         </div>
       </div>
+      </>
+      )}
     </main>
   );
 }

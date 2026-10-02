@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { esteVarianta } from "@/lib/test";
 
 const COOKIE_COMPLETAT = "chestionar_completat";
 
 type RaspunsLikertInput = { numar: number; valoare: number };
 type RaspunsDeschisInput = { numarIntrebare: number; text: string };
+type RaspunsTestInput = { numar: number; varianta: string };
 
 export async function POST(req: NextRequest) {
   const cookieCompletat = req.cookies.get(COOKIE_COMPLETAT)?.value === "1";
@@ -20,6 +22,7 @@ export async function POST(req: NextRequest) {
     grupa?: string;
     raspunsuriLikert?: RaspunsLikertInput[];
     raspunsuriDeschise?: RaspunsDeschisInput[];
+    raspunsuriTest?: RaspunsTestInput[];
   };
 
   try {
@@ -40,6 +43,34 @@ export async function POST(req: NextRequest) {
 
   const raspunsuriLikert = body.raspunsuriLikert ?? [];
   const raspunsuriDeschise = body.raspunsuriDeschise ?? [];
+  const raspunsuriTest = Array.isArray(body.raspunsuriTest) ? body.raspunsuriTest : [];
+
+  // Partea 1 — testul de cunoștințe: toate întrebările active trebuie să aibă
+  // exact o variantă (A-D) aleasă.
+  const intrebariTestActive = await prisma.intrebareTest.findMany({
+    where: { activa: true },
+    select: { id: true, numar: true },
+  });
+  if (raspunsuriTest.length !== intrebariTestActive.length) {
+    return NextResponse.json(
+      { eroare: "Trebuie răspuns la toate întrebările din testul de cunoștințe." },
+      { status: 400 }
+    );
+  }
+  const hartaTest = new Map(intrebariTestActive.map((i) => [i.numar, i.id]));
+  const testVazute = new Set<number>();
+  for (const r of raspunsuriTest) {
+    if (!hartaTest.has(r?.numar) || testVazute.has(r.numar)) {
+      return NextResponse.json({ eroare: "Întrebare necunoscută în testul de cunoștințe." }, { status: 400 });
+    }
+    if (!esteVarianta(r.varianta)) {
+      return NextResponse.json(
+        { eroare: `Varianta aleasă pentru întrebarea de test ${r.numar} este invalidă.` },
+        { status: 400 }
+      );
+    }
+    testVazute.add(r.numar);
+  }
 
   const intrebariActive = await prisma.intrebareLikert.findMany({
     where: { activa: true },
@@ -84,6 +115,12 @@ export async function POST(req: NextRequest) {
         create: raspunsuriLikert.map((r) => ({
           intrebareId: hartaIntrebari.get(r.numar)!,
           valoare: r.valoare,
+        })),
+      },
+      raspunsuriTest: {
+        create: raspunsuriTest.map((r) => ({
+          intrebareId: hartaTest.get(r.numar)!,
+          varianta: r.varianta,
         })),
       },
       raspunsuriDeschise: {

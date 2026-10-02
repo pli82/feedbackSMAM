@@ -164,3 +164,38 @@ npx prisma migrate deploy                              # producție
   14.2.x la data livrării (există actualizări de securitate periodice —
   rulează din când în când `npm outdated` și actualizează la ultimul patch
   din 14.2.x înainte de un deploy nou).
+
+## 7. Partea 1 — Test de cunoștințe SMAM
+
+Chestionarul public are acum două părți: **Partea 1** (test cu întrebări cu 4
+variante, un singur răspuns corect) și **Partea 2** (evaluarea cursului — scala
+1-5 și întrebările deschise, neschimbată). Formatorul și județul se aleg o
+singură dată, la început, și se aplică ambelor părți.
+
+În Partea 1, imediat după alegerea unei variante, răspunsul corect se marchează
+cu verde, iar varianta greșită aleasă cu roșu; răspunsul nu mai poate fi
+schimbat. La final, respondentul vede scorul obținut.
+
+Administrare:
+- `/admin/intrebari` — import în bloc din Excel (`.xlsx`), descărcare a
+  întrebărilor curente (servește și ca șablon), adăugare / editare / activare-
+  dezactivare / ștergere individuală, alegerea răspunsului corect.
+  Importul actualizează întrebările cu același număr și adaugă pe cele noi; nu
+  șterge nimic și, la prima eroare de validare, nu importă nimic.
+- `/admin/dashboard` → tab „Partea 1 — Test de cunoștințe”: scor mediu, întrebări
+  cu cele mai multe răspunsuri greșite, întrebări cel mai bine înțelese,
+  distribuția pe variante (cu cea mai aleasă greșeală) și rezultate pe județ și
+  pe formator. Filtrele de sus (formator / județ) se aplică și aici.
+- Exportul Excel conține, pentru test: scorul și varianta aleasă la fiecare
+  întrebare (în foaia „Răspunsuri”) și foile „Test - pe întrebări”,
+  „Test - întrebări x județ”, „Test - întrebări x formator”.
+
+Corectitudinea se calculează din cheia curentă a întrebării (nu e stocată în
+răspuns), deci o cheie greșită se poate corecta retroactiv. Statisticile iau în
+calcul doar întrebările active. Ștergerea unei întrebări șterge și răspunsurile
+date la ea — pentru a păstra istoricul, folosiți „Dezactivează”.
+
+Tabele noi: `IntrebareTest`, `RaspunsTest` (migrarea
+`20261002120000_adauga_test_cunostinte`). După `git push`, rulați o singură dată
+`npx prisma migrate deploy` cu `DATABASE_URL`-ul de producție.
+

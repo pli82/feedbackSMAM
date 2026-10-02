@@ -6,9 +6,12 @@ export async function middleware(req: NextRequest) {
   const token = req.cookies.get(ADMIN_COOKIE_NAME)?.value;
   const autentificat = await verificaTokenAdmin(token);
 
-  const esteRutaProtejataPagina = pathname.startsWith("/admin/dashboard");
+  const esteRutaProtejataPagina =
+    pathname.startsWith("/admin/dashboard") || pathname.startsWith("/admin/intrebari");
   const esteRutaProtejataApi =
-    pathname.startsWith("/api/admin/stats") || pathname.startsWith("/api/admin/export");
+    pathname.startsWith("/api/admin/stats") ||
+    pathname.startsWith("/api/admin/export") ||
+    pathname.startsWith("/api/admin/intrebari");
 
   if (esteRutaProtejataApi && !autentificat) {
     return NextResponse.json({ eroare: "Neautorizat." }, { status: 401 });
@@ -26,5 +29,12 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/dashboard", "/admin/login", "/api/admin/stats", "/api/admin/export"],
+  matcher: [
+    "/admin/dashboard",
+    "/admin/intrebari",
+    "/admin/login",
+    "/api/admin/stats",
+    "/api/admin/export",
+    "/api/admin/intrebari/:path*",
+  ],
 };

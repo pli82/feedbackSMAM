@@ -5,6 +5,7 @@ import {
   calculeazaRezumatPerGrup,
   obtineOptiuniFiltrare,
 } from "@/lib/stats";
+import { calculeazaStatisticiTest } from "@/lib/statsTest";
 
 export async function GET(req: NextRequest) {
   if (!(await esteAdminAutentificat())) {
@@ -15,11 +16,12 @@ export async function GET(req: NextRequest) {
   const formator = searchParams.get("formator") ?? undefined;
   const grupa = searchParams.get("grupa") ?? undefined;
 
-  const [statistici, optiuniFiltrare, comparatieFormatori, comparatieGrupe] = await Promise.all([
+  const [statistici, optiuniFiltrare, comparatieFormatori, comparatieGrupe, test] = await Promise.all([
     calculeazaStatistici({ formator, grupa }),
     obtineOptiuniFiltrare(),
     calculeazaRezumatPerGrup("formator"),
     calculeazaRezumatPerGrup("grupa"),
+    calculeazaStatisticiTest({ formator, grupa }),
   ]);
 
   return NextResponse.json({
@@ -28,5 +30,6 @@ export async function GET(req: NextRequest) {
     optiuniFiltrare,
     comparatieFormatori,
     comparatieGrupe,
+    test,
   });
 }

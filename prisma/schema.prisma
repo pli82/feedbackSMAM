@@ -21,6 +21,7 @@ model Chestionar {
   creatLa            DateTime         @default(now())
   raspunsuriLikert   RaspunsLikert[]
   raspunsuriDeschise RaspunsDeschis[]
+  raspunsuriTest     RaspunsTest[]
 
   @@index([formator])
   @@index([grupa])
@@ -58,4 +59,36 @@ model RaspunsDeschis {
   text           String
 
   @@index([numarIntrebare])
+}
+
+// PARTEA 1 — Test de cunoștințe despre SMAM (anti-mită). Întrebări cu 4 variante
+// (A-D) și un singur răspuns corect, gestionate din administrare (import Excel
+// sau editare individuală). Textul și cheia de răspuns sunt în baza de date.
+model IntrebareTest {
+  id            Int           @id @default(autoincrement())
+  numar         Int           @unique
+  text          String
+  optiuneA      String
+  optiuneB      String
+  optiuneC      String
+  optiuneD      String
+  // "A" | "B" | "C" | "D"
+  raspunsCorect String
+  activa        Boolean       @default(true)
+  raspunsuri    RaspunsTest[]
+}
+
+// Varianta aleasă de respondent. Corectitudinea nu se stochează: se calculează
+// din cheia curentă a întrebării, ca o eroare de cheie să poată fi corectată
+// retroactiv din administrare.
+model RaspunsTest {
+  id           String        @id @default(cuid())
+  chestionarId String
+  chestionar   Chestionar    @relation(fields: [chestionarId], references: [id], onDelete: Cascade)
+  intrebareId  Int
+  intrebare    IntrebareTest @relation(fields: [intrebareId], references: [id], onDelete: Cascade)
+  varianta     String
+
+  @@unique([chestionarId, intrebareId])
+  @@index([intrebareId])
 }

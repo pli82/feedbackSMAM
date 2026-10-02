@@ -3,6 +3,13 @@
 import { useState } from "react";
 
 type Intrebare = { id: number; numar: number; text: string };
+type IntrebareTest = {
+  id: number;
+  numar: number;
+  text: string;
+  optiuni: { varianta: string; text: string }[];
+  raspunsCorect: string;
+};
 
 const FORMATORI = ["Loredana-Irina Pop", "Octavian-Mircea Chesaru", "Ambii formatori"];
 const JUDETE = [
@@ -24,7 +31,16 @@ const SCALA = [
   { valoare: 5, eticheta: "în foarte mare măsură" },
 ];
 
-export default function FormularChestionar({ intrebari }: { intrebari: Intrebare[] }) {
+export default function FormularChestionar({
+  intrebari,
+  intrebariTest = [],
+}: {
+  intrebari: Intrebare[];
+  intrebariTest?: IntrebareTest[];
+}) {
+  // Partea 1 — varianta aleasă pentru fiecare întrebare de test (numar -> "A".."D").
+  // Odată aleasă, varianta e blocată: se afișează imediat verde/roșu.
+  const [raspunsuriTest, setRaspunsuriTest] = useState<Record<number, string>>({});
   const [raspunsuriLikert, setRaspunsuriLikert] = useState<Record<number, number>>({});
   const [formator, setFormator] = useState("");
   const [grupa, setGrupa] = useState("");
@@ -33,6 +49,13 @@ export default function FormularChestionar({ intrebari }: { intrebari: Intrebare
   const [eroare, setEroare] = useState<string | null>(null);
   const [seTrimite, setSeTrimite] = useState(false);
   const [trimis, setTrimis] = useState(false);
+
+  function alegeVariantaTest(numarIntrebare: number, varianta: string) {
+    setRaspunsuriTest((prev) => (prev[numarIntrebare] ? prev : { ...prev, [numarIntrebare]: varianta }));
+    setEroare(null);
+  }
+
+  const scorTest = intrebariTest.filter((i) => raspunsuriTest[i.numar] === i.raspunsCorect).length;
 
   function seteazaRaspuns(numarIntrebare: number, valoare: number) {
     setRaspunsuriLikert((prev) => ({ ...prev, [numarIntrebare]: valoare }));
@@ -45,6 +68,17 @@ export default function FormularChestionar({ intrebari }: { intrebari: Intrebare
  if (!formator || !grupa) {
       setEroare("Vă rugăm selectați formatorul și județul înainte de a trimite chestionarul.");
       document.getElementById("context-sesiune")?.scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
+
+    const testNeincompletat = intrebariTest.filter((i) => !raspunsuriTest[i.numar]);
+    if (testNeincompletat.length > 0) {
+      setEroare(
+        `Vă rugăm răspundeți la toate cele ${intrebariTest.length} întrebări din Partea 1 (testul de cunoștințe).`
+      );
+      document
+        .getElementById(`test-${testNeincompletat[0].numar}`)
+        ?.scrollIntoView({ behavior: "smooth", block: "center" });
       return;
     }
 
@@ -73,6 +107,10 @@ export default function FormularChestionar({ intrebari }: { intrebari: Intrebare
         body: JSON.stringify({
                   formator,
           grupa,
+          raspunsuriTest: Object.entries(raspunsuriTest).map(([numar, varianta]) => ({
+            numar: Number(numar),
+            varianta,
+          })),
           raspunsuriLikert: Object.entries(raspunsuriLikert).map(([numar, valoare]) => ({
             numar: Number(numar),
             valoare,
@@ -101,6 +139,15 @@ export default function FormularChestionar({ intrebari }: { intrebari: Intrebare
           Vă mulțumim pentru timpul acordat și pentru contribuția la îmbunătățirea
           activităților de instruire!
         </p>
+        {intrebariTest.length > 0 && (
+          <p className="text-[15px] text-navy-900 mb-2">
+            Testul de cunoștințe: ați răspuns corect la{" "}
+            <span className="font-semibold">
+              {scorTest} din {intrebariTest.length}
+            </span>{" "}
+            întrebări.
+          </p>
+        )}
         <p className="text-sm text-navy-900/60">Răspunsul dumneavoastră a fost înregistrat anonim.</p>
       </div>
     );
@@ -164,6 +211,85 @@ export default function FormularChestionar({ intrebari }: { intrebari: Intrebare
           </div>
         </div>
       </div>
+
+      {intrebariTest.length > 0 && (
+        <section className="mb-8" aria-labelledby="titlu-partea-1">
+          <h2 id="titlu-partea-1" className="text-base font-serif font-semibold text-navy-900 mb-1">
+            Partea 1 — Test de cunoștințe: sistemul de management anti-mită
+          </h2>
+          <p className="text-sm text-navy-900/60 mb-4">
+            Alegeți o singură variantă pentru fiecare întrebare. După alegere, răspunsul corect se
+            marchează cu verde, iar o variantă greșită cu roșu. Răspunsul nu mai poate fi schimbat.
+          </p>
+          <div className="space-y-4">
+            {intrebariTest.map((intrebare, index) => {
+              const aleasa = raspunsuriTest[intrebare.numar];
+              const raspuns = Boolean(aleasa);
+              const corect = aleasa === intrebare.raspunsCorect;
+              return (
+                <div
+                  key={intrebare.numar}
+                  id={`test-${intrebare.numar}`}
+                  className="bg-white border border-navy-800/10 rounded-lg p-5"
+                >
+                  <p className="text-[15px] leading-relaxed mb-4">
+                    {index + 1}. {intrebare.text}
+                  </p>
+                  <div className="space-y-2" role="group" aria-label={`Întrebarea ${index + 1}`}>
+                    {intrebare.optiuni.map((o) => {
+                      const eCorecta = o.varianta === intrebare.raspunsCorect;
+                      const eAleasa = o.varianta === aleasa;
+                      let clase = "border-navy-800/15 bg-white hover:bg-navy-800/5 cursor-pointer";
+                      let marcaj = "";
+                      if (raspuns) {
+                        if (eCorecta) {
+                          clase = "border-green-600 bg-green-50 text-green-900 cursor-default";
+                          marcaj = "✓";
+                        } else if (eAleasa) {
+                          clase = "border-red-600 bg-red-50 text-red-900 cursor-default";
+                          marcaj = "✗";
+                        } else {
+                          clase = "border-navy-800/10 bg-white text-navy-900/50 cursor-default";
+                        }
+                      }
+                      return (
+                        <button
+                          key={o.varianta}
+                          type="button"
+                          disabled={raspuns}
+                          onClick={() => alegeVariantaTest(intrebare.numar, o.varianta)}
+                          aria-pressed={eAleasa}
+                          className={`w-full flex items-start gap-3 text-left border rounded-md px-3 py-2.5 text-sm leading-relaxed transition-colors disabled:opacity-100 ${clase}`}
+                        >
+                          <span className="font-semibold w-5 shrink-0">{o.varianta}.</span>
+                          <span className="flex-1">{o.text}</span>
+                          {marcaj && <span className="font-semibold shrink-0" aria-hidden="true">{marcaj}</span>}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {raspuns && (
+                    <p
+                      className={`text-sm mt-3 font-medium ${corect ? "text-green-800" : "text-red-800"}`}
+                      role="status"
+                    >
+                      {corect
+                        ? "Corect!"
+                        : `Greșit. Răspunsul corect este ${intrebare.raspunsCorect}.`}
+                    </p>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
+      {intrebariTest.length > 0 && (
+        <h2 className="text-base font-serif font-semibold text-navy-900 mb-3">
+          Partea 2 — Evaluarea cursului
+        </h2>
+      )}
 
       <div className="bg-white border border-navy-800/10 rounded-lg p-6 mb-6">
         <p className="text-sm text-navy-900/70 mb-3">Scală de evaluare pentru întrebările 1-10</p>

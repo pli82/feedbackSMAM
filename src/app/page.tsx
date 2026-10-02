@@ -15,6 +15,23 @@ export default async function PaginaChestionar() {
     select: { id: true, numar: true, text: true },
   });
 
+  const intrebariTestDb = await prisma.intrebareTest.findMany({
+    where: { activa: true },
+    orderBy: { numar: "asc" },
+  });
+  const intrebariTest = intrebariTestDb.map((i) => ({
+    id: i.id,
+    numar: i.numar,
+    text: i.text,
+    optiuni: [
+      { varianta: "A", text: i.optiuneA },
+      { varianta: "B", text: i.optiuneB },
+      { varianta: "C", text: i.optiuneC },
+      { varianta: "D", text: i.optiuneD },
+    ],
+    raspunsCorect: i.raspunsCorect,
+  }));
+
   return (
     <main className="max-w-2xl mx-auto px-4 py-10">
       <div className="bg-navy-800 text-white rounded-lg p-6 mb-6 text-center">
@@ -47,7 +64,7 @@ export default async function PaginaChestionar() {
           Chestionarul nu este configurat momentan. Reveniți mai târziu.
         </div>
       ) : (
-        <FormularChestionar intrebari={intrebari} />
+        <FormularChestionar intrebari={intrebari} intrebariTest={intrebariTest} />
       )}
     </main>
   );
