@@ -15,11 +15,9 @@ export async function GET(req: NextRequest) {
   }
 
   const { searchParams } = req.nextUrl;
-  const formator = searchParams.get("formator");
   const grupa = searchParams.get("grupa");
 
   const whereChestionar: Prisma.ChestionarWhereInput = {
-    ...(formator ? { formator } : {}),
     ...(grupa ? { grupa } : {}),
   };
 
@@ -28,7 +26,6 @@ export async function GET(req: NextRequest) {
   // Partea 1 — test de cunoștințe (doar întrebările active)
   const { intrebari: intrebariTest, randuri: toateRanduriTest } = await incarcaDateTest();
   const randuriTest = filtreazaRanduri(toateRanduriTest, {
-    formator: formator ?? undefined,
     grupa: grupa ?? undefined,
   });
   const cheieTest = new Map(intrebariTest.map((i) => [i.id, i.raspunsCorect]));
@@ -51,7 +48,6 @@ export async function GET(req: NextRequest) {
   foaie.columns = [
     { header: "Nr. crt.", key: "nr", width: 8 },
     { header: "Data completării", key: "data", width: 20 },
-    { header: "Formator", key: "formator", width: 26 },
     { header: "Județ", key: "judet", width: 24 },
     ...(intrebariTest.length > 0
       ? [
@@ -76,7 +72,6 @@ export async function GET(req: NextRequest) {
     const rand: Record<string, string | number> = {
       nr: index + 1,
       data: chestionar.creatLa.toLocaleString("ro-RO"),
-      formator: chestionar.formator ?? "",
       judet: chestionar.grupa ?? "",
       d11: chestionar.raspunsuriDeschise.find((r) => r.numarIntrebare === 11)?.text ?? "",
       d12: chestionar.raspunsuriDeschise.find((r) => r.numarIntrebare === 12)?.text ?? "",
@@ -148,7 +143,7 @@ export async function GET(req: NextRequest) {
     foaieTest.getRow(1).alignment = { wrapText: true, vertical: "middle" };
     foaieTest.views = [{ state: "frozen", ySplit: 1 }];
 
-    // Matrice: % răspunsuri corecte pentru fiecare întrebare, pe județ / formator.
+    // Matrice: % răspunsuri corecte pentru fiecare întrebare, pe județ.
     const adaugaMatrice = (titluFoaie: string, camp: "grupa" | "formator", etichetaCamp: string) => {
       const grupuri = Array.from(new Set(randuriTest.map((r) => r[camp] ?? "Nespecificat"))).sort((a, b) =>
         a.localeCompare(b, "ro")
@@ -204,7 +199,6 @@ export async function GET(req: NextRequest) {
       foaieM.views = [{ state: "frozen", xSplit: 2, ySplit: 1 }];
     };
     adaugaMatrice("Test - întrebări x județ", "grupa", "județ");
-    adaugaMatrice("Test - întrebări x formator", "formator", "formator");
   }
 
   const buffer = await workbook.xlsx.writeBuffer();

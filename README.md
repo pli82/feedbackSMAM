@@ -199,3 +199,10 @@ Tabele noi: `IntrebareTest`, `RaspunsTest` (migrarea
 `20261002120000_adauga_test_cunostinte`). După `git push`, rulați o singură dată
 `npx prisma migrate deploy` cu `DATABASE_URL`-ul de producție.
 
+## 8. Fără formator în chestionar
+
+Formularul public nu mai cere formatorul; se alege doar **județul**. În admin au
+dispărut filtrul și tabelele pe formator, iar exportul Excel nu mai are coloana
+„Formator” și nici foaia „Test - întrebări x formator”. Coloana `formator` rămâne
+în baza de date (goală pentru răspunsurile noi), deci nu e nevoie de migrare.
+

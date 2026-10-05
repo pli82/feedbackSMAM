@@ -158,11 +158,6 @@ export default function SectiuneTest({ test }: { test: StatisticaTest }) {
       </div>
 
       <div className="space-y-4 mb-6">
-        <TabelGrup
-          titlu="Rezultate test pe formator"
-          randuri={test.comparatieFormatori}
-          nrIntrebari={test.nrIntrebari}
-        />
         <TabelGrup titlu="Rezultate test pe județ" randuri={test.comparatieGrupe} nrIntrebari={test.nrIntrebari} />
       </div>
 

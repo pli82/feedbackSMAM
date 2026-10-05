@@ -12,7 +12,6 @@ type IntrebareTest = {
   raspunsCorect: string;
 };
 
-const FORMATORI = ["Loredana-Irina Pop", "Octavian-Mircea Chesaru"];
 const JUDETE = [
   "SEDIUL CENTRAL - BUCUREȘTI",
   "Alba", "Arad", "Argeș", "Bacău", "Bihor", "Bistrița-Năsăud", "Botoșani",
@@ -43,7 +42,6 @@ export default function FormularChestionar({
   // Odată aleasă, varianta e blocată: se afișează imediat verde/roșu.
   const [raspunsuriTest, setRaspunsuriTest] = useState<Record<number, string>>({});
   const [raspunsuriLikert, setRaspunsuriLikert] = useState<Record<number, number>>({});
-  const [formator, setFormator] = useState("");
   const [grupa, setGrupa] = useState("");
   const [raspuns11, setRaspuns11] = useState("");
   const [raspuns12, setRaspuns12] = useState("");
@@ -66,8 +64,8 @@ export default function FormularChestionar({
   async function trimiteFormular(e: React.FormEvent) {
     e.preventDefault();
 
- if (!formator || !grupa) {
-      setEroare("Vă rugăm selectați formatorul și județul înainte de a trimite chestionarul.");
+    if (!grupa) {
+      setEroare("Vă rugăm selectați județul înainte de a trimite chestionarul.");
       document.getElementById("context-sesiune")?.scrollIntoView({ behavior: "smooth", block: "center" });
       return;
     }
@@ -106,7 +104,6 @@ export default function FormularChestionar({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-                  formator,
           grupa,
           raspunsuriTest: Object.entries(raspunsuriTest).map(([numar, varianta]) => ({
             numar: Number(numar),
@@ -153,35 +150,11 @@ export default function FormularChestionar({
     <form onSubmit={trimiteFormular}>
       <div id="context-sesiune" className="bg-white border border-navy-800/10 rounded-lg p-5 mb-6">
         <p className="text-sm text-navy-900/70 mb-3">
-          Aceste informații ajută la organizarea rezultatelor pe sesiuni și nu vă identifică
+          Această informație ajută la organizarea rezultatelor pe județe și nu vă identifică
           personal.
         </p>
         <div className="grid sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm text-navy-900/70 mb-1" htmlFor="formator">
-              Formator
-            </label>
-            <select
-              id="formator"
-              className="w-full border border-navy-800/15 rounded-md p-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-navy-800/30"
-              value={formator}
-              onChange={(e) => {
-                setFormator(e.target.value);
-                setEroare(null);
-              }}
-              required
-            >
-              <option value="" disabled>
-                Selectați formatorul
-              </option>
-              {FORMATORI.map((f) => (
-                <option key={f} value={f}>
-                  {f}
-                </option>
-              ))}
-            </select>
-          </div>
-                   <div>
             <label className="block text-sm text-navy-900/70 mb-1" htmlFor="grupa">
               Județ
             </label>

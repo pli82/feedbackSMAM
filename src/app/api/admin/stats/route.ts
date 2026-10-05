@@ -13,22 +13,19 @@ export async function GET(req: NextRequest) {
   }
 
   const { searchParams } = req.nextUrl;
-  const formator = searchParams.get("formator") ?? undefined;
   const grupa = searchParams.get("grupa") ?? undefined;
 
-  const [statistici, optiuniFiltrare, comparatieFormatori, comparatieGrupe, test] = await Promise.all([
-    calculeazaStatistici({ formator, grupa }),
+  const [statistici, optiuniFiltrare, comparatieGrupe, test] = await Promise.all([
+    calculeazaStatistici({ grupa }),
     obtineOptiuniFiltrare(),
-    calculeazaRezumatPerGrup("formator"),
     calculeazaRezumatPerGrup("grupa"),
-    calculeazaStatisticiTest({ formator, grupa }),
+    calculeazaStatisticiTest({ grupa }),
   ]);
 
   return NextResponse.json({
     ...statistici,
-    filtruActiv: { formator: formator ?? null, grupa: grupa ?? null },
+    filtruActiv: { grupa: grupa ?? null },
     optiuniFiltrare,
-    comparatieFormatori,
     comparatieGrupe,
     test,
   });

@@ -28,9 +28,8 @@ type Statistici = {
   satisfactieGenerala: StatisticaIntrebare | null;
   intrebari: StatisticaIntrebare[];
   raspunsuriDeschise: RaspunsDeschis[];
-  filtruActiv: { formator: string | null; grupa: string | null };
-  optiuniFiltrare: { formatori: OptiuneFiltrare[]; grupe: OptiuneFiltrare[] };
-  comparatieFormatori: RezumatGrup[];
+  filtruActiv: { grupa: string | null };
+  optiuniFiltrare: { grupe: OptiuneFiltrare[] };
   comparatieGrupe: RezumatGrup[];
   test: StatisticaTest;
 };
@@ -110,13 +109,11 @@ export default function PaginaDashboardAdmin() {
   const [statistici, setStatistici] = useState<Statistici | null>(null);
   const [eroare, setEroare] = useState<string | null>(null);
   const [cautare, setCautare] = useState("");
-  const [filtruFormator, setFiltruFormator] = useState("");
   const [filtruGrupa, setFiltruGrupa] = useState("");
   const [tab, setTab] = useState<"test" | "evaluare">("test");
 
-  const incarcaStatistici = useCallback((formator: string, grupa: string) => {
+  const incarcaStatistici = useCallback((grupa: string) => {
     const params = new URLSearchParams();
-    if (formator) params.set("formator", formator);
     if (grupa) params.set("grupa", grupa);
 
     fetch(`/api/admin/stats?${params.toString()}`)
@@ -129,8 +126,8 @@ export default function PaginaDashboardAdmin() {
   }, []);
 
   useEffect(() => {
-    incarcaStatistici(filtruFormator, filtruGrupa);
-  }, [filtruFormator, filtruGrupa, incarcaStatistici]);
+    incarcaStatistici(filtruGrupa);
+  }, [filtruGrupa, incarcaStatistici]);
 
   const raspunsuriFiltrate = useMemo(() => {
     if (!statistici) return [];
@@ -174,7 +171,6 @@ export default function PaginaDashboardAdmin() {
 
   function exportUrl() {
     const params = new URLSearchParams();
-    if (filtruFormator) params.set("formator", filtruFormator);
     if (filtruGrupa) params.set("grupa", filtruGrupa);
     const query = params.toString();
     return query ? `/api/admin/export?${query}` : "/api/admin/export";
@@ -221,24 +217,6 @@ export default function PaginaDashboardAdmin() {
 
       <div className="bg-white border border-navy-800/10 rounded-lg p-4 mb-6 flex flex-wrap gap-4 items-end">
         <div>
-          <label className="block text-xs text-navy-900/60 mb-1" htmlFor="filtru-formator">
-            Formator
-          </label>
-          <select
-            id="filtru-formator"
-            className="border border-navy-800/15 rounded-md px-3 py-1.5 text-sm bg-white"
-            value={filtruFormator}
-            onChange={(e) => setFiltruFormator(e.target.value)}
-          >
-            <option value="">Toți formatorii</option>
-            {statistici.optiuniFiltrare.formatori.map((f) => (
-              <option key={f.valoare} value={f.valoare}>
-                {f.valoare} ({f.total})
-              </option>
-            ))}
-          </select>
-        </div>
-        <div>
           <label className="block text-xs text-navy-900/60 mb-1" htmlFor="filtru-grupa">
             Județ
           </label>
@@ -256,10 +234,9 @@ export default function PaginaDashboardAdmin() {
             ))}
           </select>
         </div>
-        {(filtruFormator || filtruGrupa) && (
+        {filtruGrupa && (
           <button
             onClick={() => {
-              setFiltruFormator("");
               setFiltruGrupa("");
             }}
             className="text-sm text-navy-900/60 underline"
@@ -318,7 +295,6 @@ export default function PaginaDashboardAdmin() {
       </div>
 
       <div className="space-y-4 mb-6">
-        <TabelComparatie titlu="Rezultate separate pe formator" randuri={statistici.comparatieFormatori} />
         <TabelComparatie titlu="Rezultate separate pe județ" randuri={statistici.comparatieGrupe} />
       </div>
 

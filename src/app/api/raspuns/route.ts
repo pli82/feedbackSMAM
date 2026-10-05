@@ -18,7 +18,6 @@ export async function POST(req: NextRequest) {
   }
 
   let body: {
-    formator?: string;
     grupa?: string;
     raspunsuriLikert?: RaspunsLikertInput[];
     raspunsuriDeschise?: RaspunsDeschisInput[];
@@ -31,12 +30,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ eroare: "Corp de cerere invalid." }, { status: 400 });
   }
 
-  const formator = typeof body.formator === "string" ? body.formator.trim() : "";
   const grupa = typeof body.grupa === "string" ? body.grupa.trim() : "";
 
-  if (!formator || formator.length > 200) {
-    return NextResponse.json({ eroare: "Formatorul este obligatoriu." }, { status: 400 });
-  }
   if (!grupa || grupa.length > 200) {
     return NextResponse.json({ eroare: "Grupa/sesiunea este obligatorie." }, { status: 400 });
   }
@@ -109,7 +104,6 @@ export async function POST(req: NextRequest) {
 
   const chestionar = await prisma.chestionar.create({
     data: {
-      formator,
       grupa,
       raspunsuriLikert: {
         create: raspunsuriLikert.map((r) => ({
