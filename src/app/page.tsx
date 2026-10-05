@@ -45,9 +45,6 @@ export default async function PaginaChestionar() {
           Permanente.
         </p>
         <p className="text-sm font-medium text-gold-500 mb-1">Chestionarul este anonim.</p>
-        <p className="text-xs text-white/60">
-          Prezentatori: Loredana-Irina Pop, Octavian-Mircea Chesaru
-        </p>
       </div>
 
       {aCompletatDeja ? (
