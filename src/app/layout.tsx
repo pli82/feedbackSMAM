@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Chestionar de evaluare — curs management anti-mită | AEP",
+  title: "Evaluarea cunoștințelor și feedback — management anti-mită | AEP",
   description:
-    "Chestionar anonim de evaluare a calității cursului de management anti-mită, Autoritatea Electorală Permanentă.",
+    "Chestionar anonim de evaluare a cunoștințelor și de colectare a feedbackului privind instruirea în managementul anti-mită, Autoritatea Electorală Permanentă.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

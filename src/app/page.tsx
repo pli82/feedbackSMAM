@@ -37,12 +37,12 @@ export default async function PaginaChestionar() {
       <div className="bg-navy-800 text-white rounded-lg p-6 mb-6 text-center">
         <p className="text-sm text-white/70 mb-1">Autoritatea Electorală Permanentă</p>
         <h1 className="text-xl font-serif font-semibold mb-3 leading-snug">
-          Chestionar de evaluare a calității cursului de management anti-mită
+          Evaluarea cunoștințelor și oferirea de feedback
         </h1>
         <p className="text-sm text-white/85 leading-relaxed mb-3">
-          Evaluarea calității instruirii și identificarea unor oportunități de îmbunătățire a
-          viitoarelor sesiuni de formare organizate pentru personalul Autorității Electorale
-          Permanente.
+          Chestionarul are ca scop evaluarea cunoștințelor dobândite în cadrul instruirii
+          privind managementul anti-mită și colectarea feedbackului din partea participanților
+          cu privire la experiența de instruire.
         </p>
         <p className="text-sm font-medium text-gold-500 mb-1">Chestionarul este anonim.</p>
       </div>
