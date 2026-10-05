@@ -63,6 +63,14 @@ export default async function PaginaChestionar() {
       ) : (
         <FormularChestionar intrebari={intrebari} intrebariTest={intrebariTest} />
       )}
+
+      {/* Acces discret la administrare (cere autentificare). */}
+      <a
+        href="/admin/dashboard"
+        className="fixed bottom-2 right-3 text-[11px] text-navy-900/30 hover:text-navy-900/80 transition-colors"
+      >
+        Admin
+      </a>
     </main>
   );
 }
