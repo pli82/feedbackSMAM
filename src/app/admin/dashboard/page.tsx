@@ -196,14 +196,15 @@ export default function PaginaDashboardAdmin() {
 
   return (
     <main className="max-w-3xl mx-auto px-4 py-8">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <div>
           <h1 className="text-lg font-serif font-semibold text-navy-900">
             Rezultate — curs management anti-mită
           </h1>
           <p className="text-sm text-navy-900/60">Autoritatea Electorală Permanentă</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
+          <a href="/" className="text-sm border border-navy-800/20 rounded-md px-3 py-2 hover:bg-navy-800/5 transition-colors">← Chestionar</a>
           <a href="/admin/intrebari" className="text-sm border border-navy-800/20 rounded-md px-3 py-2 hover:bg-navy-800/5 transition-colors">Întrebări test</a>
           <a href={exportUrl()} className="text-sm border border-navy-800/20 rounded-md px-3 py-2 hover:bg-navy-800/5 transition-colors">Exportă Excel</a>
           <button

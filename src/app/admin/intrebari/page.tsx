@@ -259,9 +259,14 @@ export default function PaginaIntrebariTest() {
           </h1>
           <p className="text-sm text-navy-900/60">Partea 1 a chestionarului</p>
         </div>
-        <a href="/admin/dashboard" className={butonSecundar}>
-          ← Rezultate
-        </a>
+        <div className="flex flex-wrap gap-2">
+          <a href="/" className={butonSecundar}>
+            ← Chestionar
+          </a>
+          <a href="/admin/dashboard" className={butonSecundar}>
+            Rezultate
+          </a>
+        </div>
       </div>
 
       <div className="bg-white border border-navy-800/10 rounded-lg p-5 mb-6">

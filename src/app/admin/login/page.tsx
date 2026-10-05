@@ -83,6 +83,12 @@ export default function PaginaLoginAdmin() {
           {seIncarca ? "Se autentifică..." : "Autentificare"}
         </button>
       </form>
+
+      <p className="text-center mt-4">
+        <a href="/" className="text-sm text-navy-900/60 hover:text-navy-900 underline">
+          ← Înapoi la chestionar
+        </a>
+      </p>
     </main>
   );
 }
