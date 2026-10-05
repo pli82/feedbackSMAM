@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import FormularChestionar from "@/components/FormularChestionar";
+import { CHEIE_LINK_PREZENTARE } from "@/lib/setari";
 
 export const dynamic = "force-dynamic";
 
@@ -14,6 +15,12 @@ export default async function PaginaChestionar() {
     orderBy: { numar: "asc" },
     select: { id: true, numar: true, text: true },
   });
+
+  // Linkul YouTube către prezentare (setat din administrare). Dacă tabela nu există
+  // încă (migrare neaplicată), chestionarul funcționează oricum, fără link.
+  const setareLink = await prisma.setare
+    .findUnique({ where: { cheie: CHEIE_LINK_PREZENTARE } })
+    .catch(() => null);
 
   const intrebariTestDb = await prisma.intrebareTest.findMany({
     where: { activa: true },
@@ -61,7 +68,11 @@ export default async function PaginaChestionar() {
           Chestionarul nu este configurat momentan. Reveniți mai târziu.
         </div>
       ) : (
-        <FormularChestionar intrebari={intrebari} intrebariTest={intrebariTest} />
+        <FormularChestionar
+          intrebari={intrebari}
+          intrebariTest={intrebariTest}
+          linkPrezentare={setareLink?.valoare ?? null}
+        />
       )}
 
       {/* Acces discret la administrare (cere autentificare). */}

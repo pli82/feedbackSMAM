@@ -7,11 +7,14 @@ export async function middleware(req: NextRequest) {
   const autentificat = await verificaTokenAdmin(token);
 
   const esteRutaProtejataPagina =
-    pathname.startsWith("/admin/dashboard") || pathname.startsWith("/admin/intrebari");
+    pathname.startsWith("/admin/dashboard") ||
+    pathname.startsWith("/admin/intrebari") ||
+    pathname.startsWith("/admin/prezentare");
   const esteRutaProtejataApi =
     pathname.startsWith("/api/admin/stats") ||
     pathname.startsWith("/api/admin/export") ||
-    pathname.startsWith("/api/admin/intrebari");
+    pathname.startsWith("/api/admin/intrebari") ||
+    pathname.startsWith("/api/admin/prezentare");
 
   if (esteRutaProtejataApi && !autentificat) {
     return NextResponse.json({ eroare: "Neautorizat." }, { status: 401 });
@@ -32,9 +35,11 @@ export const config = {
   matcher: [
     "/admin/dashboard",
     "/admin/intrebari",
+    "/admin/prezentare",
     "/admin/login",
     "/api/admin/stats",
     "/api/admin/export",
     "/api/admin/intrebari/:path*",
+    "/api/admin/prezentare",
   ],
 };

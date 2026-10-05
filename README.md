@@ -206,3 +206,15 @@ dispărut filtrul și tabelele pe formator, iar exportul Excel nu mai are coloan
 „Formator” și nici foaia „Test - întrebări x formator”. Coloana `formator` rămâne
 în baza de date (goală pentru răspunsurile noi), deci nu e nevoie de migrare.
 
+## 9. Linkul „Vezi prezentarea” (YouTube)
+
+Deasupra întrebărilor din chestionar apare butonul **▶ Vezi prezentarea**, care
+deschide într-o filă nouă un videoclip YouTube (ca să nu se piardă completările).
+Linkul se setează din administrare, la `/admin/prezentare` (butonul „Prezentare”
+din dashboard): se acceptă doar linkuri `youtube.com` / `youtu.be`. Dacă linkul
+este șters, secțiunea dispare. Videoclipul trebuie să fie „Public” sau „Nelistat”.
+
+Tabel nou: `Setare` (cheie/valoare), migrarea `20261005160000_adauga_setari`;
+rulați `npx prisma migrate deploy`. Dacă tabela lipsește, chestionarul
+funcționează oricum, doar fără buton.
+

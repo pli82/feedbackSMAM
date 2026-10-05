@@ -34,9 +34,11 @@ const SCALA = [
 export default function FormularChestionar({
   intrebari,
   intrebariTest = [],
+  linkPrezentare = null,
 }: {
   intrebari: Intrebare[];
   intrebariTest?: IntrebareTest[];
+  linkPrezentare?: string | null;
 }) {
   // Partea 1 — varianta aleasă pentru fiecare întrebare de test (numar -> "A".."D").
   // Odată aleasă, varianta e blocată: se afișează imediat verde/roșu.
@@ -180,6 +182,20 @@ export default function FormularChestionar({
           </div>
         </div>
       </div>
+
+      {linkPrezentare && (
+        <div className="bg-white border border-navy-800/10 rounded-lg p-5 mb-6 text-center">
+          <a
+            href={linkPrezentare}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 bg-navy-800 text-white rounded-md px-5 py-2.5 text-[15px] font-medium hover:bg-navy-700 transition-colors"
+          >
+            <span aria-hidden="true">▶</span>
+            Vezi prezentarea
+          </a>
+        </div>
+      )}
 
       {intrebariTest.length > 0 && (
         <section className="mb-8" aria-labelledby="titlu-partea-1">

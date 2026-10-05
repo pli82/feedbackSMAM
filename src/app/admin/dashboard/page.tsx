@@ -206,6 +206,7 @@ export default function PaginaDashboardAdmin() {
         <div className="flex flex-wrap gap-2">
           <a href="/" className="text-sm border border-navy-800/20 rounded-md px-3 py-2 hover:bg-navy-800/5 transition-colors">← Chestionar</a>
           <a href="/admin/intrebari" className="text-sm border border-navy-800/20 rounded-md px-3 py-2 hover:bg-navy-800/5 transition-colors">Întrebări test</a>
+          <a href="/admin/prezentare" className="text-sm border border-navy-800/20 rounded-md px-3 py-2 hover:bg-navy-800/5 transition-colors">Prezentare</a>
           <a href={exportUrl()} className="text-sm border border-navy-800/20 rounded-md px-3 py-2 hover:bg-navy-800/5 transition-colors">Exportă Excel</a>
           <button
             onClick={delogheaza}

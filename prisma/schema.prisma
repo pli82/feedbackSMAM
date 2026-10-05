@@ -92,3 +92,10 @@ model RaspunsTest {
   @@unique([chestionarId, intrebareId])
   @@index([intrebareId])
 }
+
+// Setări simple cheie/valoare, editabile din administrare (ex. linkul către
+// prezentarea video afișat deasupra întrebărilor).
+model Setare {
+  cheie   String @id
+  valoare String
+}
